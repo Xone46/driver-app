@@ -8,6 +8,8 @@ const { body, validationResult } = require('express-validator');
 
 router.post('/signup', body('email').isEmail(), body('password').isLength({ min: 6 }), authControllers.signup);
 router.route('/signin').post(authControllers.signin);
+router.route('/delete').post(authControllers.delete);
+
 
 
 
