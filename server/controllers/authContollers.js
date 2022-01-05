@@ -1,5 +1,5 @@
 const con = require('../config/db');
-const { body, validationResult } = require('express-validator');
+const { validationResult } = require('express-validator');
 const bcrypt = require('bcrypt');
 const JWT = require('jsonwebtoken');
 
@@ -42,18 +42,15 @@ exports.signup = async (req, res, next) => {
                         let sql = `INSERT INTO users(id, email, password) VALUES ('','${email}','${passwordHash}')`;
                         con.query(sql, function (err, result) {
 
-                            if (err) {
-                                return res.status(400).json({ msg: err })
+                            if (result) {
+
+                                // JWT
+                                const token = JWT.sign({ email }, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9", { expiresIn: 36000 })
+                                return res.status(200).json({ msg: "succes", token: token });
+
                             }
+                            
 
-                            // JWT
-                            const token = JWT.sign({
-                                email
-                            }, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
-                                { expiresIn: 36000 }
-                            )
-
-                            return res.status(200).json({ msg: "succes", token: token })
                         });
 
                     }
@@ -132,30 +129,30 @@ exports.delete = async (req, res, next) => {
     let sqlSearchUser = `SELECT * FROM users WHERE id = "${id}"`;
     con.query(sqlSearchUser, (err, result) => {
 
-            if (result) {
-                
-                (async function(){
+        if (result) {
 
-                    let passwordHash = result[0].password;
-                    let isMatch = await bcrypt.compare(password, passwordHash);
-    
-                    if (isMatch) {
-                        
-                        let sqlDeleteUser = `DELETE FROM users WHERE id = "${id}"`;
-                        con.query(sqlDeleteUser, (err, result) => {
-    
-                            if (result) {
-                                res.status(200).json({ msg: 'delete Compte Succes' })
-                            }
-                        })
-    
-                    }
- 
-                })()
+            (async function () {
 
-            }
-        })
-  
+                let passwordHash = result[0].password;
+                let isMatch = await bcrypt.compare(password, passwordHash);
+
+                if (isMatch) {
+
+                    let sqlDeleteUser = `DELETE FROM users WHERE id = "${id}"`;
+                    con.query(sqlDeleteUser, (err, result) => {
+
+                        if (result) {
+                            res.status(200).json({ msg: 'delete Compte Succes' })
+                        }
+                    })
+
+                }
+
+            })()
+
+        }
+    })
+
 
 }
 

@@ -6,6 +6,7 @@ const port = 3000;
 // routes
 const driverRouter = require('./routes/driverRoutes');
 const authRouter = require('./routes/authRoutes');
+const postRouter = require('./routes/postRoutes');
 
 //midellware
 app.use(bodyParser.json());
@@ -19,6 +20,7 @@ app.get('/', (req, res) => {
 
 app.use('/driver', driverRouter);
 app.use('/auth', authRouter);
+app.use('/post', postRouter);
 
 
 
